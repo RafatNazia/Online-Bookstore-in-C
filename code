@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure for a book node
+struct BookNode {
+    char title[100];
+    char author[100];
+    int isbn;
+    struct BookNode *left;
+    struct BookNode *right;
+};
+
+// Function to create a new book node
+struct BookNode* createBookNode(char title[], char author[], int isbn) {
+    struct BookNode* newNode = (struct BookNode*)malloc(sizeof(struct BookNode));
+    strcpy(newNode->title, title);
+    strcpy(newNode->author, author);
+    newNode->isbn = isbn;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a book into the BST
+struct BookNode* insertBook(struct BookNode* root, char title[], char author[], int isbn) {
+    // If the tree is empty, return a new node
+    if (root == NULL)
+        return createBookNode(title, author, isbn);
+
+    // Otherwise, recur down the tree
+    if (strcmp(title, root->title) < 0)
+        root->left = insertBook(root->left, title, author, isbn);
+    else if (strcmp(title, root->title) > 0)
+        root->right = insertBook(root->right, title, author, isbn);
+
+    // Return the (unchanged) node pointer
+    return root;
+}
+
+// Function to search for a book in the BST
+struct BookNode* searchBook(struct BookNode* root, char title[]) {
+    // Base Cases: root is null or title is present at root
+    if (root == NULL || strcmp(root->title, title) == 0)
+        return root;
+
+    // Title is greater than root's title
+    if (strcmp(root->title, title) < 0)
+        return searchBook(root->right, title);
+
+    // Title is smaller than root's title
+    return searchBook(root->left, title);
+}
+
+// Function to print the details of a book
+void printBookDetails(struct BookNode* book) {
+    printf("Title: %s\n", book->title);
+    printf("Author: %s\n", book->author);
+    printf("ISBN: %d\n", book->isbn);
+}
+
+// Function to display all books in inorder traversal
+void displayBooks(struct BookNode* root) {
+    if (root != NULL) {
+        displayBooks(root->left);
+        printBookDetails(root);
+        displayBooks(root->right);
+    }
+}
+
+// Main function
+int main() {
+    struct BookNode* root = NULL;
+
+    // Inserting books
+    root = insertBook(root, "The Great Gatsby", "F. Scott Fitzgerald", 123456);
+    root = insertBook(root, "To Kill a Mockingbird", "Harper Lee", 234567);
+    root = insertBook(root, "1984", "George Orwell", 345678);
+
+    // Displaying all books
+    printf("All Books:\n");
+    displayBooks(root);
+
+    // Searching for a book
+    char searchTitle[100];
+    strcpy(searchTitle, "1984");
+    struct BookNode* foundBook = searchBook(root, searchTitle);
+    if (foundBook != NULL) {
+        printf("\nBook found:\n");
+        printBookDetails(foundBook);
+    } else {
+        printf("\nBook not found.\n");
+    }
+
+    return 0;
+}
